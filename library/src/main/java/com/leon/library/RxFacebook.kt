@@ -1,4 +1,4 @@
-package com.leon.rxfacebook
+package com.leon.library
 
 import android.app.Activity
 import android.os.Bundle
