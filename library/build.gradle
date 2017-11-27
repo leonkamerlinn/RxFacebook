@@ -24,7 +24,24 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.android.support:appcompat-v7:27.0.1'
+    //ANDROID SUPPORT LIBRARY
+    implementation "com.android.support.constraint:constraint-layout:$constraint_layout"
+    //noinspection GradleCompatible
+    implementation "com.android.support:appcompat-v7:$support_version"
+
+
+    //FACEBOOK
+    implementation "com.facebook.android:facebook-login:$facebook_version"
+    //GSON
+    implementation "com.google.code.gson:gson:$gson_version"
+
+    //RXANDROID
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+    //RXJAVA
+    //implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+    //RXKOTLIN
+    implementation "io.reactivex.rxjava2:rxkotlin:$rxkotlin_version"
+
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
