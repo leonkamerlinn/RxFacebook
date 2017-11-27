@@ -1,4 +1,4 @@
-package com.leon.library;
+package com.leon.rxfacebook;
 
 
 import com.google.gson.annotations.SerializedName;

@@ -1,4 +1,4 @@
-package com.leon.library
+package com.leon.rxfacebook
 
 /**
  * Created by cesarferreira on 13/10/15.

@@ -1,4 +1,4 @@
-package com.leon.library
+package com.leon.rxfacebook
 
 object Fields {
     val ID = "id"
