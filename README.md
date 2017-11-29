@@ -58,3 +58,18 @@ class MainActivity : AppCompatActivity() {
     
 }
 ```
+
+```gradle
+allprojects {
+	repositories {
+		...
+		maven { url 'https://jitpack.io' }
+	}
+}
+```
+
+```gradle
+dependencies {
+	compile 'com.github.leonkamerlinn:RxFacebook:1.0.5'
+}
+```
