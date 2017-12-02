@@ -27,7 +27,7 @@ task clean(type: Delete) {
 }
 
 ext {
-    support_version = '27.0.1'
+    support_version = '27.0.2'
     constraint_layout = '1.0.2'
     anko_version = '0.8.3'
     gp_services_version = '11.6.0'

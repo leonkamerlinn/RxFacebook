@@ -4,11 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
-import android.widget.Toast
+import com.leon.library.FacebookUser
 import com.leon.library.Fields
 import com.leon.library.Request
 import com.leon.library.RxFacebook
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 
 
@@ -16,22 +18,25 @@ class MainActivity : AppCompatActivity() {
     
     val facebookLogin by lazy { findViewById<Button>(R.id.facebookLogin) }
     val rxFacebook by lazy { RxFacebook(this) }
-
+    val accessToken by lazy { rxFacebook.getAccessToken() }
+    val request by lazy { rxFacebook.request(
+        arrayOf(Request.EMAIL, Request.PUBLIC_PROFILE),
+        arrayOf(Fields.EMAIL, Fields.BIRTHDAY, Fields.GENDER)
+    )}
 
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
      
- 
+        val bi = Observable.zip(accessToken, request, BiFunction { accessToken: String, user: FacebookUser ->
+            println(accessToken)
+            println(user.email)
+        })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
         facebookLogin.setOnClickListener {
-            rxFacebook.request(
-                arrayOf(Request.EMAIL, Request.PUBLIC_PROFILE),
-                arrayOf(Fields.EMAIL, Fields.BIRTHDAY, Fields.GENDER)
-            )
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { Toast.makeText(this, it.email, Toast.LENGTH_LONG).show() }
+            bi.subscribe()
         }
     }
     

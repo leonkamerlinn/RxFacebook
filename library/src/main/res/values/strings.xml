@@ -1,5 +1,5 @@
 <resources>
 	<string name="app_name">library</string>
-	<string name="facebook_app_id">134300883957443git </string>
+	<string name="facebook_app_id">134300883957443</string>
 	<string name="fb_login_protocol_scheme">fb134300883957443</string>
 </resources>

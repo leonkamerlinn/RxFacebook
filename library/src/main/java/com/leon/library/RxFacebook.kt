@@ -7,12 +7,15 @@ import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
 import com.google.gson.Gson
 import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
+import io.reactivex.subjects.PublishSubject
+
 
 /**
  * Created by Leon on 27.11.2017..
  */
 class RxFacebook (private val activity: Activity){
-    val callbackManager by lazy { CallbackManager.Factory.create() }
+    val callbackManager: CallbackManager by lazy { CallbackManager.Factory.create() }
     private val accessTokenTracker: AccessTokenTracker by lazy {
         object : AccessTokenTracker() {
             override fun onCurrentAccessTokenChanged(oldAccessToken: AccessToken?, currentAccessToken: AccessToken) {
@@ -20,6 +23,8 @@ class RxFacebook (private val activity: Activity){
             }
         }
     }
+    
+    private val accessToken: PublishSubject<String> by lazy { PublishSubject.create<String>() }
     
     
     private val profileTracker: ProfileTracker by lazy {
@@ -30,9 +35,8 @@ class RxFacebook (private val activity: Activity){
         }
     }
     
-  
-
-
+    fun getAccessToken(): Observable<String> = accessToken
+    
     
     fun request(requestArray: Array<String>, fieldsArray: Array<String>): Observable<FacebookUser> {
       
@@ -44,19 +48,28 @@ class RxFacebook (private val activity: Activity){
                 }
         
                 override fun onSuccess(result: LoginResult?) {
-                    val token = result!!.accessToken.token
-            
-                    val request = GraphRequest.newMeRequest(result.accessToken) { jsonObject, response ->
-                        val user: FacebookUser = Gson().fromJson(jsonObject.toString(), FacebookUser::class.java)
-                        it.onNext(user)
-                        it.onComplete()
+                    
+                    if (result != null && result.accessToken != null) {
+                        accessToken.onNext(result.accessToken.token)
+    
+                        val request = GraphRequest.newMeRequest(result.accessToken) { jsonObject, _ ->
+                            val user: FacebookUser = Gson().fromJson(jsonObject.toString(), FacebookUser::class.java)
+                            it.onNext(user)
+                            it.onComplete()
+                        }
+    
+                        val parameters = Bundle()
+                        parameters.putString("fields", fieldsArray.implode(","))
+                        request.parameters = parameters
+                        request.executeAsync()
+                        
+                        
+                    } else {
+                        accessToken.onError(Throwable("Cannot get access token"))
+                        it.onError(Throwable("Cannot get access token"))
                     }
-            
-            
-                    val parameters = Bundle()
-                    parameters.putString("fields", fieldsArray.implode(","))
-                    request.parameters = parameters
-                    request.executeAsync()
+                    
+                   
                 }
         
                 override fun onCancel() {
