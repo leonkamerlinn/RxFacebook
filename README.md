@@ -28,33 +28,33 @@ class MainActivity : AppCompatActivity() {
     
     val facebookLogin by lazy { findViewById<Button>(R.id.facebookLogin) }
     val rxFacebook by lazy { RxFacebook(this) }
-
+    val accessTokenObserver by lazy { rxFacebook.getAccessToken() }
+    val userObserver by lazy { rxFacebook.request(
+        arrayOf(Request.EMAIL, Request.PUBLIC_PROFILE),
+        arrayOf(Fields.EMAIL, Fields.BIRTHDAY, Fields.GENDER)
+    )}
 
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
      
- 
+        val biObserver = Observable.zip(accessTokenObserver, userObserver, BiFunction { accessToken: String, user: FacebookUser ->
+            println(accessToken)
+            println(user.email)
+        })
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
         facebookLogin.setOnClickListener {
-            rxFacebook.request(
-                arrayOf(Request.EMAIL, Request.PUBLIC_PROFILE),
-                arrayOf(Fields.EMAIL, Fields.BIRTHDAY, Fields.GENDER)
-            )
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { Toast.makeText(this, it.email, Toast.LENGTH_LONG).show() }
+            biObserver.subscribe()
         }
     }
-    
-
     
     
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         rxFacebook.callbackManager.onActivityResult(requestCode, resultCode, data)
     }
-    
     
 }
 ```
@@ -70,6 +70,6 @@ allprojects {
 ### Add the dependency
 ```gradle
 dependencies {
-	compile 'com.github.leonkamerlinn:RxFacebook:1.0.5'
+	compile 'com.github.leonkamerlinn:RxFacebook:1.0.6'
 }
 ```
