@@ -18,25 +18,29 @@ class MainActivity : AppCompatActivity() {
     
     val facebookLogin by lazy { findViewById<Button>(R.id.facebookLogin) }
     val rxFacebook by lazy { RxFacebook(this) }
-    val accessTokenObserver by lazy { rxFacebook.getAccessToken() }
-    val userObserver by lazy { rxFacebook.request(
-        arrayOf(Request.EMAIL, Request.PUBLIC_PROFILE),
-        arrayOf(Fields.EMAIL, Fields.BIRTHDAY, Fields.GENDER)
-    )}
+    
 
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
      
-        val biObserver = Observable.zip(accessTokenObserver, userObserver, BiFunction { accessToken: String, user: FacebookUser ->
+        Observable.zip(rxFacebook.accessTokenObserver, rxFacebook.userObserver, BiFunction { accessToken: String, user: FacebookUser ->
             println(accessToken)
             println(user.email)
         })
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
+            .subscribe()
+        
+        
+        
         facebookLogin.setOnClickListener {
-            biObserver.subscribe()
+            rxFacebook.request(
+                arrayOf(Request.EMAIL, Request.PUBLIC_PROFILE),
+                arrayOf(Fields.EMAIL, Fields.BIRTHDAY, Fields.GENDER)
+            )
+            
         }
     }
     
